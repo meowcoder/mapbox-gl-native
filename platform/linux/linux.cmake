@@ -2,10 +2,9 @@ find_package(CURL REQUIRED)
 find_package(ICU OPTIONAL_COMPONENTS i18n)
 find_package(ICU OPTIONAL_COMPONENTS uc)
 find_package(JPEG REQUIRED)
-find_package(OpenGL REQUIRED GLX)
+find_package(OpenGL REQUIRED EGL)
 find_package(PNG REQUIRED)
 find_package(PkgConfig REQUIRED)
-find_package(X11 REQUIRED)
 
 pkg_search_module(LIBUV libuv REQUIRED)
 
@@ -49,7 +48,7 @@ target_sources(
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/timer.cpp
         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/utf.cpp
         ${PROJECT_SOURCE_DIR}/platform/linux/src/gl_functions.cpp
-        ${PROJECT_SOURCE_DIR}/platform/linux/src/headless_backend_glx.cpp
+        ${PROJECT_SOURCE_DIR}/platform/linux/src/headless_backend_egl.cpp
 )
 
 # FIXME: Should not be needed, but now needed by node because of the headless frontend.
@@ -60,7 +59,6 @@ target_include_directories(
         ${CURL_INCLUDE_DIRS}
         ${JPEG_INCLUDE_DIRS}
         ${LIBUV_INCLUDE_DIRS}
-        ${X11_INCLUDE_DIRS}
 )
 
 include(${PROJECT_SOURCE_DIR}/vendor/nunicode.cmake)
@@ -86,11 +84,10 @@ target_link_libraries(
         ${CURL_LIBRARIES}
         ${JPEG_LIBRARIES}
         ${LIBUV_LIBRARIES}
-        ${X11_LIBRARIES}
         $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::i18n>
         $<$<NOT:$<BOOL:${MBGL_USE_BUILTIN_ICU}>>:ICU::uc>
         $<$<BOOL:${MBGL_USE_BUILTIN_ICU}>:mbgl-vendor-icu>
-        OpenGL::GLX
+        OpenGL::EGL
         PNG::PNG
         mbgl-vendor-nunicode
         mbgl-vendor-sqlite
@@ -98,7 +95,6 @@ target_link_libraries(
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/bin)
 add_subdirectory(${PROJECT_SOURCE_DIR}/expression-test)
-add_subdirectory(${PROJECT_SOURCE_DIR}/platform/glfw)
 add_subdirectory(${PROJECT_SOURCE_DIR}/platform/node)
 
 add_executable(
